@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# shellcheck disable=SC2009
+pgrep -f bash | xargs ps -o pid,comm
