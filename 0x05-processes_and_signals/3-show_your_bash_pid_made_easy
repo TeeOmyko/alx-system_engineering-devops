@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
+# PID made easy
 
-# shellcheck disable=SC2009
-pgrep -f bash | xargs ps -o pid,comm
+ps -eo pid,comm | awk '$2 ~ /bash/ { print $1, $2 }'
