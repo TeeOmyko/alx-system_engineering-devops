@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+# Use ps command to get a list of running processes
+# -A option shows processes for all users
+# -o option specifies the format of the output
+# h option removes the header line
+# u option shows user-oriented format
+# f option shows process hierarchy
+ps -Afuh
