@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# display lines containing the bash word and get the PID of your Bash process
+
+# ignore shellcheck warning about using ps with -ef flag
+# shellcheck disable=SC2009
+ps aux | grep bash | grep -v grep
