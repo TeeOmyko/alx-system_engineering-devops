@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# This script displays from /etc/shadow the username, id, and home path for /etc/passwd
+
+while IFS=: read -r username password uid gid info home shell; do
+    # Print the username, uid, and home directory path for each user
+    echo "Username: $username"
+    echo "User ID: $uid"
+    echo "Home directory: $home"
+done < /etc/passwd
