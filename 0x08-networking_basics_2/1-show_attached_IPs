@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Displays all active IPv4 addresses on the machine.
+
+# Use the 'ip' command to list all IPv4 addresses and print the fourth field (the IP address itself)
+# Then, use the 'cut' command to remove the subnet mask from the output
+ip -4 -o addr show | awk '{print $4}' | cut -d "/" -f 1
