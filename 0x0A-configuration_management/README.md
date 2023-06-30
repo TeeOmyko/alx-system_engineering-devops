@@ -1,0 +1,1 @@
+solutions on configuration management
