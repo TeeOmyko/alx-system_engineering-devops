@@ -1,6 +1,16 @@
-#!usr/bin/env bash
+#!/usr/bin/env bash
+# Configure Nginx server so that /redirect_me is redirecting to another page
 
-string_for_replacement="server_name _;\n\nlocation\/redirect_me {\n\treturn 301 https:\/\/www.google.com;\n}"
-sudo sed -i "s/server_name _;/$string_for_replacement/" /etc/ngnix/sites-enabled/default
+# Install nginx
+sudo apt-get update
+sudo apt-get install -y nginx
 
-service nginx restart
+# Creating Sample Page
+echo "Hello World!" > /var/www/html/index.html
+
+# add the following configuration to the existing server block
+string_for_replacement="server_name _;\n\trewrite ^\/redirect_me https:\/\/www.youtube.com/@themathsclub permanent;"
+sudo sed -i "s/server_name _;/$string_for_replacement/" /etc/nginx/sites-enabled/default
+
+# Restart Nginx
+service nginx start
