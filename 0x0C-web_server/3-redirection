@@ -1,0 +1,6 @@
+#!usr/bin/env bash
+
+string_for_replacement="server_name _;\n\nlocation\/redirect_me {\n\treturn 301 https:\/\/www.google.com;\n}"
+sudo sed -i "s/server_name _;/$string_for_replacement/" /etc/ngnix/sites-enabled/default
+
+service nginx restart
