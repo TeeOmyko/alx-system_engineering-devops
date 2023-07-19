@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Install and configure HAproxy on your lb-01 server
+
+sudo apt-get update -y
+sudo apt-get install haproxy -y
+
+echo "
+frontend teresaomiko
+    bind *:80
+    default_backend omikoteresa
+
+backend omikoteresa
+    balance roundrobin
+    server 187677-web-01 34.232.52.161:80 check
+    server 187677-web-02 100.25.188.104:80 check
+" >> /etc/haproxy/haproxy.cfg
+
+sudo sed -i 's/ENABLED=0/ENABLED=1/g' /etc/default/haproxy
+
+sudo service haproxy restart
