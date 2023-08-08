@@ -1,38 +1,67 @@
 #!/usr/bin/python3
-"""Function to count words in all hot posts of a given Reddit subreddit
-   that are found in a list
-"""
+"""This module queries the reddit API"""
 import requests
+from sys import argv
 
 
-def count_words(subreddit, word_list, array=None, after=""):
-    if array is None:
-        array = {}
-    url = "https://www.reddit.com/r/{}/hot/.json".format(subreddit)
-    headers = {"User-Agent": "Mozilla/5.0"}
-    params = {"after": after}
-    data = requests.get(url, headers=headers, params=params,
-                        allow_redirects=False)
+def recurse_count(subreddit, hot_list=[], after=None):
+    """This function queries the reddit API recursively
+    """
+    url = "https://www.reddit.com/r/{}/hot.json".format(subreddit)
+    payload = {"after": after, "limit": 100}
+    headers = {"User-Agent": "Python/requests"}
 
-    if data.status_code == 200:
-        results = data.json().get("data")
-        after = results.get("after")
-
-        for entry in results.get("children"):
-            split = entry.get("data").get("title").lower().split()
-
-            for word in word_list:
-                if word.lower() in split:
-                    times = len([t for t in split if t == word.lower()])
-                    if array.get(word) is None:
-                        array[word] = times
-                    else:
-                        array[word] += times
-
-        if after:
-            count_words(subreddit, word_list, array, after)
+    try:
+        req = requests.get(url, headers=headers, params=payload,
+                           allow_redirects=False)
+        if req.status_code == 200:
+            data = req.json()
+            after = data.get("data")["after"]
+            for post in data.get("data")["children"]:
+                hot_list.append(post.get("data")["title"])
+            if after:
+                return recurse_count(subreddit, hot_list, after)
+            else:
+                return hot_list
         else:
-            sorted_results = sorted(array.items(), key=lambda x: (-x[1],
-                                    x[0].lower()))
-            for word, count in sorted_results:
-                print("{}: {}".format(word.lower(), count))
+            return None
+    except requests.exceptions.JSONDecodeError:
+        pass
+
+
+def count_words(subreddit, word_list):
+    """This function queries the reddit API and
+    sorts a list of words by occurences
+    """
+    word_dict = {}
+
+    all_titles = recurse_count(subreddit)
+    word_list = [w.lower() for w in word_list]
+
+    # Only parse responses that not None
+    if all_titles:
+        for word in word_list:
+            count = 0
+            for title in all_titles:
+
+                # convert words to lowercase for comparison
+                title = [w.lower() for w in title.split()]
+
+                # Only count for present words in response
+                if word in title:
+                    for w in title:
+                        if word == w:
+                            count += 1
+            # Only add words that are present to dictionary
+            if count:
+
+                """If a word is duplicated in the function parameter
+                add all the occurrences
+                """
+                if word_dict.get(word):
+                    count += word_dict[word]
+                word_dict[word] = count
+        sorted_dict = dict(sorted(word_dict.items(),
+                           key=lambda item: item[1], reverse=True))
+        for k, v in sorted_dict.items():
+            print("{}: {:d}".format(k, v))
